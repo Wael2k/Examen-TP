@@ -15,8 +15,6 @@ import examen_TP.demo.enumaration.RoleEnum;
 import examen_TP.demo.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +28,18 @@ import java.util.Set;
 public class AuthServiceImp implements AuthService {
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     AuthRepository authRepository;
+
     @Autowired
     RoleRepository roleRepository;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
+
+
     @Autowired
     private JwtConfig jwtConfig;
+
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     @Override
     public RegisterResponseDto register(RegisterRequestDto registerRequest) {
@@ -52,9 +54,9 @@ public class AuthServiceImp implements AuthService {
         Role roleAdmin = new Role();
         roleAdmin.setName(RoleEnum.ADMIN);
         roles.add(roleAdmin);
-        Role roleUser = new Role();
-        roleUser.setName(RoleEnum.USER);
-        roles.add(roleUser);
+//        Role roleUser = new Role();
+//        roleUser.setName(RoleEnum.USER);
+//        roles.add(roleUser);
         Set<Role> setRoles = new HashSet<>(roleRepository.saveAll(roles));
         user.setRole(setRoles);
         user = authRepository.save(user);
@@ -62,8 +64,6 @@ public class AuthServiceImp implements AuthService {
         return RegisterResponseDto.builder()
                 .userName(user.getUsername()).build();
     }
-
-
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         User userInfo = userRepository.findByUserName(loginRequestDto.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
@@ -71,12 +71,6 @@ public class AuthServiceImp implements AuthService {
         if(!this.encoder.matches(loginRequestDto.getPassword(), userInfo.getPassword())){
             throw new RuntimeException("Incorrect password");
         }
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        userInfo.getUsername(),
-                        loginRequestDto.getPassword()
-                )
-        );
         var jwtToken = JwtUtils.generateToken(userInfo,jwtConfig);
         log.trace("jwt token generated for user {}",userInfo.getId());
         return LoginResponseDto.builder().accessToken(jwtToken).build();

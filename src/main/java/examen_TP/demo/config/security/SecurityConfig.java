@@ -25,8 +25,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthentificationFilter jwtAuthentificationFilter;;
 
-    @Autowired
-    private AuthenticationProvider authenticationProvider;
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/**",
             "/v2/api-docs",
@@ -50,12 +48,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
-                                .requestMatchers("/api/test/test").hasRole("USER")
+                                .requestMatchers("/api/test/test").hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

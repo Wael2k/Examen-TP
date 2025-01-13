@@ -32,9 +32,6 @@ public  class  JwtUtils {
         return extractClaim(token, Claims::getSubject, signInKey);
     }
 
-    public static String extractTypeRegister(String token, String signInKey) {
-        return extractAllClaims(token, signInKey).get("typeRegister").toString();
-    }
 
     public static <T> T extractClaim(String token, Function<Claims, T> claimsResolver, String signInKey) {
         final Claims claims = extractAllClaims(token, signInKey);
@@ -55,10 +52,6 @@ public  class  JwtUtils {
     }
 
 
-    public boolean isTokenValid(String token, String signingKey) {
-        final String username = extractUsername(token,signingKey);
-        return (username != null) && !isTokenExpired(token,signingKey);
-    }
 
     public static boolean isTokenExpired(String token, String signingKey) {
         return extractAllClaims(token,signingKey).getExpiration().after(new Date());
