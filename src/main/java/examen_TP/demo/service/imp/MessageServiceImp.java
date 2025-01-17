@@ -37,7 +37,7 @@ public class MessageServiceImp implements MessageService {
             if(userRepository.findById(item).isPresent()){
                 usersAvailable.add(item);
             }else {
-                throw new RuntimeException("user not found ");
+                throw new DataNotFoundException("user not found ");
             }
         });
         message.setRecepteur(usersAvailable);
@@ -48,7 +48,7 @@ public class MessageServiceImp implements MessageService {
         messages.add(message);
         user.setMessages(messages);
         userRepository.save(user);
-        MessageResponseDto responseDto = MessageResponseDto.builder()
+        return MessageResponseDto.builder()
                 .id(message.getId())
                 .contenu(message.getContenu())
                 .type(message.getType())
@@ -58,7 +58,6 @@ public class MessageServiceImp implements MessageService {
                         .id(message.getEmetteur().getId())
                         .build())
                 .build();
-        return responseDto;
     }
 
     @Override
@@ -76,7 +75,7 @@ public class MessageServiceImp implements MessageService {
         });
         message.setRecepteur(usersAvailable);
         message = messageRepository.save(message);
-        MessageResponseDto responseDto = MessageResponseDto.builder()
+        return MessageResponseDto.builder()
                 .id(message.getId())
                 .contenu(message.getContenu())
                 .type(message.getType())
@@ -86,7 +85,6 @@ public class MessageServiceImp implements MessageService {
                         .id(message.getEmetteur().getId())
                         .build())
                 .build();
-        return responseDto;
     }
 
     @Override
@@ -109,7 +107,7 @@ public class MessageServiceImp implements MessageService {
 
     @Override
     public void deleteMessage(int messageId) {
-        Message message = messageRepository.findById(messageId) .orElseThrow(() -> new RuntimeException("Message not found"));
+        Message message = messageRepository.findById(messageId) .orElseThrow(() -> new DataNotFoundException("Message not found"));
         messageRepository.delete(message);
     }
 
