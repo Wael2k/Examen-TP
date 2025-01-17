@@ -11,12 +11,13 @@ import java.util.List;
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
+    @Enumerated(EnumType.STRING)
     private MessageTypeEnum type;
-    private MessageTypeEnum contenu;
-    private Long emetteur ;
-    @ElementCollection(targetClass = Long.class, fetch = FetchType.EAGER)
-    private List<Long> recepteur;
-
+    private String contenu;
+    @ElementCollection(targetClass = Integer.class, fetch = FetchType.EAGER)
+    private List<Integer> recepteur;
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
+    private User emetteur;
 
 }

@@ -4,6 +4,7 @@ import examen_TP.demo.config.security.utils.JwtAuthentificationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,7 +27,7 @@ public class SecurityConfig {
     private JwtAuthentificationFilter jwtAuthentificationFilter;;
 
     private static final String[] WHITE_LIST_URL = {
-            "/api/v1/auth/**",
+
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -48,7 +49,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
+                                .requestMatchers("/api/v1/auth/create").permitAll()
+                                .requestMatchers("/api/v1/auth/update").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/auth/delete/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/auth/getAll").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/auth/login").permitAll()
                                 .requestMatchers("/api/test/test").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/role/create").permitAll()
+                                .requestMatchers("/api/v1/role/update/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/role/delete/**").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/role/getAll").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/message/create").hasRole("USER")
+                                .requestMatchers("/api/v1/message/update").hasRole("USER")
+                                .requestMatchers("/api/v1/message/delete/**").hasRole("USER")
+                                .requestMatchers("/api/v1/message/getAll").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/message/filterByKeyWord").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/message/getAllMessagesByLimit").hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated()
                 )

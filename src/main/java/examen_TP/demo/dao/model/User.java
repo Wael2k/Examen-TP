@@ -6,9 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "TABLE_USER")
@@ -16,15 +14,18 @@ import java.util.Set;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id ;
+    private Integer id ;
     private String userName ;
     private String password ;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> role ;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER,mappedBy = "emetteur")
+    private List<Message> messages ;
+
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    private List<Role> role ;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
           role.stream()
                 .forEach(item ->  {
                     authorities.add(new SimpleGrantedAuthority("ROLE_"+item.getName()));
