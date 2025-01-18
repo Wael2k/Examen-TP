@@ -2,6 +2,8 @@ package examen_TP.demo.service.imp;
 
 import examen_TP.demo.config.security.JwtConfig;
 import examen_TP.demo.config.security.JwtUtils;
+import examen_TP.demo.config.security.ObjectsValidatorUtils;
+import examen_TP.demo.config.security.exceptions.BadRequestException;
 import examen_TP.demo.config.security.exceptions.DataNotFoundException;
 import examen_TP.demo.dao.AuthRepository;
 import examen_TP.demo.dao.RoleRepository;
@@ -31,6 +33,8 @@ import java.util.List;
 public class AuthServiceImp implements AuthService {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    private ObjectsValidatorUtils objectsValidatorUtil;
 
     @Autowired
     AuthRepository authRepository;
@@ -70,6 +74,10 @@ public class AuthServiceImp implements AuthService {
     }
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        List<String> errors  = objectsValidatorUtil.validate(loginRequestDto);
+        if(!errors.isEmpty()){
+            throw new BadRequestException("BAD_REQUEST","Bad request" ,errors);
+        }
         User userInfo = userRepository.findByUserName(loginRequestDto.getUsername()).orElseThrow(() -> new DataNotFoundException("NOT_FOUND","User not found"));
 
         if(!this.encoder.matches(loginRequestDto.getPassword(), userInfo.getPassword())){
